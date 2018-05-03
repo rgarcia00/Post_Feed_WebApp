@@ -2,10 +2,26 @@
 d3.select('#click-counter').append('span')
 	.text('Click Counter: ' + get_counter());
 
-// Request post data from server.
-fetch('https://jsonplaceholder.typicode.com/posts')
+// Load user database
+users_data = {}
+fetch('https://jsonplaceholder.typicode.com/users')
 	.then(response => response.json())
-	.then(json => build_feed(json));
+	.then(json => load_user_data(json))
+
+function load_user_data(data) {
+	for (var i = 0; i < data.length; i++) {
+		users_data[data[i]['id']] = data[i];
+	}
+
+	load_post_data()
+}
+
+// Request post data from server.
+function load_post_data() {
+	fetch('https://jsonplaceholder.typicode.com/posts')
+		.then(response => response.json())
+		.then(json => build_feed(json));
+}
 
 function build_feed(post_list) {
 	// Sort post list by id.
@@ -21,16 +37,13 @@ function build_feed(post_list) {
 	// Append to the div a span with the post title. Add CSS attributes with D3js.
 	post_divs.append('span')
 		.attr('class', 'title')
-		.text(function(d) { return d['title']; })
-		.style('background-color', "darkblue")
-		.style('font-size', '20px')
-		.style('color', 'white');
+		.text(function(d) { return d['title']; });
 
 	post_divs.append('br');
 
 	post_divs.append('span')
 		.attr('class', 'user')
-		.text(function(d) { return 'user id: ' + d['userId']; });
+		.text(function(d) { console.log(users_data); console.log(users_data[d['userId']]['name']); return 'user: ' + users_data[d['userId']]['name']; })
 
 	post_divs.append('br');
 
